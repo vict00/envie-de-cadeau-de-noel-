@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mes envies de Noël</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="snow" aria-hidden="true"></div>
+
+  <header class="hero">
+    <p class="eyebrow">Noël 2026</p>
+    <h1>Mes envies de Noël</h1>
+    <p class="summary" id="summary">Chargement…</p>
+  </header>
+
+  <main>
+    <section class="add-panel" id="addPanel" hidden>
+      <form id="addForm" class="add-form">
+        <input type="url" id="urlInput" placeholder="Colle le lien d'un produit…" required>
+        <button type="submit" class="btn primary" id="fetchBtn">Ajouter</button>
+      </form>
+
+      <div class="preview" id="preview" hidden>
+        <img id="pvImage" alt="">
+        <div class="pv-fields">
+          <label>Nom<input id="pvTitle" type="text"></label>
+          <div class="pv-row">
+            <label>Prix (€)<input id="pvPrice" type="number" step="0.01" min="0" placeholder="?"></label>
+            <label class="grow">Image (lien)<input id="pvImageUrl" type="url"></label>
+          </div>
+          <p class="pv-note" id="pvNote"></p>
+          <div class="pv-actions">
+            <button class="btn ghost" type="button" id="pvCancel">Annuler</button>
+            <button class="btn primary" type="button" id="pvSave">Enregistrer l'envie</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <label class="sort">Trier
+        <select id="sortSelect">
+          <option value="recent">Plus récentes</option>
+          <option value="price-asc">Prix croissant</option>
+          <option value="price-desc">Prix décroissant</option>
+        </select>
+      </label>
+    </div>
+
+    <ul class="grid" id="grid"></ul>
+    <p class="empty" id="empty" hidden>Aucune envie pour l'instant 🎄</p>
+  </main>
+
+  <footer>
+    <button class="link-btn" id="adminBtn">🔑 Gérer ma liste</button>
+  </footer>
+
+  <dialog id="tokenDialog">
+    <form method="dialog" class="token-form">
+      <h2>Mode gestion</h2>
+      <p>Colle ton jeton GitHub (accès « Contents : Read and write » sur ce dépôt). Il reste uniquement dans ce navigateur.</p>
+      <input type="password" id="tokenInput" placeholder="github_pat_…" autocomplete="off">
+      <p class="error" id="tokenError"></p>
+      <div class="pv-actions">
+        <button class="btn ghost" value="cancel">Annuler</button>
+        <button class="btn primary" id="tokenSave" value="ok">Valider</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
