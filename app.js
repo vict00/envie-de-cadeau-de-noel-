@@ -44,7 +44,7 @@
     els.toast.textContent = msg;
     els.toast.classList.add("show");
     clearTimeout(toast.t);
-    toast.t = setTimeout(() => els.toast.classList.remove("show"), 3200);
+    toast.t = setTimeout(() => els.toast.classList.remove("show"), msg.length > 60 ? 8000 : 3200);
   }
 
   function siteName(url) {
@@ -121,6 +121,9 @@
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
+      if (res.status === 403 || res.status === 404)
+        throw new Error("ton jeton n'a pas le droit d'écrire. Sur GitHub, donne-lui accès à ce dépôt avec « Contents : Read and write ».");
+      if (res.status === 401) throw new Error("jeton invalide ou expiré.");
       throw new Error(err.message || `Erreur GitHub ${res.status}`);
     }
     sha = (await res.json()).content.sha;
