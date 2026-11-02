@@ -455,17 +455,25 @@
 
   els.sortSelect.addEventListener("change", render);
 
+  // Le mode gestion n'apparaît que via le lien secret …/?admin (ou une fois le jeton enregistré)
+  const adminLink = new URLSearchParams(location.search).has("admin");
+
   function updateAdminUi() {
     els.addPanel.hidden = !isAdmin();
+    els.adminBtn.hidden = !isAdmin() && !adminLink;
     els.adminBtn.textContent = isAdmin() ? "🔒 Quitter le mode gestion" : "🔑 Gérer ma liste";
     render();
   }
 
-  els.adminBtn.addEventListener("click", () => {
-    if (isAdmin()) { setToken(null); updateAdminUi(); toast("Mode gestion désactivé"); return; }
+  function askToken() {
     els.tokenError.textContent = "";
     els.tokenInput.value = "";
     els.tokenDialog.showModal();
+  }
+
+  els.adminBtn.addEventListener("click", () => {
+    if (isAdmin()) { setToken(null); updateAdminUi(); toast("Mode gestion désactivé"); return; }
+    askToken();
   });
 
   els.tokenSave.addEventListener("click", async (e) => {
@@ -496,5 +504,6 @@
     try { wishes = await loadWishes(); }
     catch { wishes = []; }
     updateAdminUi();
+    if (adminLink && !isAdmin()) askToken();
   })();
 })();

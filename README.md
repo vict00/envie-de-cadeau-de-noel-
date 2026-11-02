@@ -13,8 +13,9 @@ la photo, le nom et le prix, et tout le monde peut consulter la liste.
    - *Repository access* : **Only select repositories** → `envie-de-cadeau-de-noel-`
    - *Permissions* → *Repository permissions* → **Contents : Read and write**
    - Génère-le et copie-le.
-4. Sur le site, clique **🔑 Gérer ma liste** en bas de page et colle le jeton.
-   Il est gardé uniquement dans ton navigateur (à refaire sur chaque appareil).
+4. Ouvre le lien secret `https://vict00.github.io/envie-de-cadeau-de-noel-/?admin` et colle le jeton.
+   C'est **une seule fois par appareil** : ensuite le site se souvient de toi, même sans `?admin`.
+   Les visiteurs ne voient aucun bouton de gestion.
 
 ## Utilisation
 
