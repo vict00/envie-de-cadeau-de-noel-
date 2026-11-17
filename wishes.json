@@ -9,11 +9,13 @@
   },
   {
     "id": "3ab151c0-ab13-4340-8031-c83541a910e6",
-    "url": "https://www.amazon.fr/Anker-Batterie-Externe-Vitesse-Int%C3%A9gr%C3%A9/dp/B0CZ9JLRC6?th=1",
+    "addedAt": "2026-11-06T10:52:14.874Z",
+    "kind": "product",
     "title": "Anker Zolo High Speed External Battery 20000mAh 30W",
-    "image": "https://m.media-amazon.com/images/I/51vZc7akF-L._AC_SL1500_.jpg",
     "price": 30,
-    "addedAt": "2026-11-06T10:52:14.874Z"
+    "rating": 5,
+    "url": "https://www.amazon.fr/Anker-Batterie-Externe-Vitesse-Int%C3%A9gr%C3%A9/dp/B0CZ9JLRC6?th=1",
+    "image": "https://m.media-amazon.com/images/I/51vZc7akF-L._AC_SL1500_.jpg"
   },
   {
     "id": "0060f1b3-5a5d-45a3-b0f0-22e8b1099a3c",
