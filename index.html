@@ -20,18 +20,39 @@
 
   <main>
     <section class="add-panel" id="addPanel" hidden>
-      <form id="addForm" class="add-form">
+      <div class="kind-tabs" role="tablist">
+        <button type="button" class="kind-tab active" data-kind="product">🔗 Article</button>
+        <button type="button" class="kind-tab" data-kind="lot">📦 Lot</button>
+        <button type="button" class="kind-tab" data-kind="perso">💶 Perso</button>
+      </div>
+
+      <form id="addForm" class="add-form" data-for="product">
         <input type="url" id="urlInput" placeholder="Colle le lien d'un produit…" required>
         <button type="submit" class="btn primary" id="fetchBtn">Ajouter</button>
       </form>
+      <form id="lotForm" class="add-form" data-for="lot" hidden>
+        <input type="url" id="lotUrl" placeholder="Colle le lien d'un article du lot…" required>
+        <button type="submit" class="btn primary" id="lotAddBtn">+ Au lot</button>
+      </form>
+      <p class="kind-hint" data-for="perso" hidden>Une envie sans lien : de l'argent, une sortie, une expérience…</p>
 
       <div class="preview" id="preview" hidden>
-        <img id="pvImage" alt="">
+        <div class="pv-visual" data-for="product perso">
+          <img id="pvImage" alt="" data-for="product">
+          <span class="pv-emoji" id="pvEmojiPreview" data-for="perso">💶</span>
+        </div>
         <div class="pv-fields">
+          <ul class="lot-items" id="lotItems" data-for="lot"></ul>
           <label>Nom<input id="pvTitle" type="text"></label>
           <div class="pv-row">
-            <label>Prix (€)<input id="pvPrice" type="number" step="0.01" min="0" placeholder="?"></label>
-            <label class="grow">Image (lien)<input id="pvImageUrl" type="url"></label>
+            <label><span id="pvPriceLabel">Prix (€)</span><input id="pvPrice" type="number" step="0.01" min="0" placeholder="?"></label>
+            <label class="grow" data-for="product">Image (lien)<input id="pvImageUrl" type="url"></label>
+            <label data-for="perso">Emoji<input id="pvEmoji" type="text" maxlength="4" value="💶"></label>
+          </div>
+          <label><span id="pvTextLabel">Note</span><textarea id="pvText" rows="2"></textarea></label>
+          <div class="stars-field">
+            <span>Importance</span>
+            <div class="stars-input" id="pvStars" role="radiogroup" aria-label="Importance sur 5"></div>
           </div>
           <p class="pv-note" id="pvNote"></p>
           <div class="pv-actions">
@@ -45,6 +66,7 @@
     <div class="toolbar">
       <label class="sort">Trier
         <select id="sortSelect">
+          <option value="rating">Les plus importantes</option>
           <option value="recent">Plus récentes</option>
           <option value="price-asc">Prix croissant</option>
           <option value="price-desc">Prix décroissant</option>

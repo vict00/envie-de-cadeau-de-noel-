@@ -28,6 +28,9 @@
     addPanel: $("addPanel"), addForm: $("addForm"), urlInput: $("urlInput"), fetchBtn: $("fetchBtn"),
     preview: $("preview"), pvImage: $("pvImage"), pvTitle: $("pvTitle"), pvPrice: $("pvPrice"),
     pvImageUrl: $("pvImageUrl"), pvNote: $("pvNote"), pvCancel: $("pvCancel"), pvSave: $("pvSave"),
+    pvPriceLabel: $("pvPriceLabel"), pvText: $("pvText"), pvTextLabel: $("pvTextLabel"), pvStars: $("pvStars"),
+    pvEmoji: $("pvEmoji"), pvEmojiPreview: $("pvEmojiPreview"),
+    lotForm: $("lotForm"), lotUrl: $("lotUrl"), lotAddBtn: $("lotAddBtn"), lotItems: $("lotItems"),
     sortSelect: $("sortSelect"), adminBtn: $("adminBtn"),
     tokenDialog: $("tokenDialog"), tokenInput: $("tokenInput"), tokenError: $("tokenError"), tokenSave: $("tokenSave"),
     toast: $("toast"),
@@ -285,10 +288,14 @@
   }
 
   // ---------- Render ----------
+  const kindOf = (w) => w.kind || "product";
+
   function render() {
     const sorted = [...wishes];
     const mode = els.sortSelect.value;
-    if (mode === "recent") sorted.sort((a, b) => (b.addedAt || "").localeCompare(a.addedAt || ""));
+    const recent = (a, b) => (b.addedAt || "").localeCompare(a.addedAt || "");
+    if (mode === "rating") sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0) || recent(a, b));
+    if (mode === "recent") sorted.sort(recent);
     if (mode === "price-asc") sorted.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
     if (mode === "price-desc") sorted.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
 
@@ -302,70 +309,115 @@
       : "La liste est vide pour le moment";
   }
 
+  function el(tag, className, text) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function image(src, alt) {
+    const img = el("img");
+    img.src = src;
+    img.alt = alt || "";
+    img.loading = "lazy";
+    img.referrerPolicy = "no-referrer";
+    img.onerror = () => img.replaceWith(placeholder());
+    return img;
+  }
+
+  function stars(rating) {
+    const s = el("div", "stars", "★".repeat(rating) + "☆".repeat(5 - rating));
+    s.setAttribute("aria-label", `Importance : ${rating} sur 5`);
+    return s;
+  }
+
   function card(w) {
-    const li = document.createElement("li");
-    li.className = "card";
+    const kind = kindOf(w);
+    const li = el("li", `card kind-${kind}` + (w.rating === 5 ? " top" : ""));
+    if (w.rating === 5) li.append(el("span", "ribbon", "❤️ Très envie"));
 
-    const thumb = document.createElement("div");
-    thumb.className = "thumb";
-    if (w.image) {
-      const img = document.createElement("img");
-      img.src = w.image;
-      img.alt = w.title || "";
-      img.loading = "lazy";
-      img.referrerPolicy = "no-referrer";
-      img.onerror = () => img.replaceWith(placeholder());
-      thumb.append(img);
-    } else thumb.append(placeholder());
-
-    const body = document.createElement("div");
-    body.className = "body";
-    const site = document.createElement("span");
-    site.className = "site";
-    site.textContent = siteName(w.url);
-    const h3 = document.createElement("h3");
-    h3.textContent = w.title || "Sans titre";
-    h3.title = w.title || "";
-    const price = document.createElement("div");
-    price.className = "price" + (w.price ? "" : " unknown");
-    price.textContent = w.price ? eur.format(w.price) : "Prix inconnu";
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-    const a = document.createElement("a");
-    a.className = "btn";
-    a.href = w.url;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.textContent = "Voir ↗";
-    actions.append(a);
-    if (isAdmin()) {
-      const edit = document.createElement("button");
-      edit.className = "btn del";
-      edit.title = "Modifier";
-      edit.setAttribute("aria-label", "Modifier");
-      edit.textContent = "✏️";
-      edit.onclick = () => editWish(w);
-      actions.append(edit);
-      const del = document.createElement("button");
-      del.className = "btn del";
-      del.title = "Supprimer";
-      del.setAttribute("aria-label", "Supprimer");
-      del.textContent = "🗑";
-      del.onclick = () => removeWish(w.id, del);
-      actions.append(del);
+    // Visuel
+    const thumb = el("div", "thumb");
+    if (kind === "lot") {
+      const imgs = (w.items || []).filter((i) => i.image).slice(0, 4);
+      if (imgs.length) {
+        thumb.classList.add("mosaic", `n${imgs.length}`);
+        imgs.forEach((i) => thumb.append(image(i.image, i.title)));
+      } else thumb.append(placeholder("📦"));
+      thumb.append(el("span", "badge", `Lot de ${(w.items || []).length}`));
+    } else if (kind === "perso") {
+      thumb.append(el("span", "placeholder big", w.emoji || "💶"));
+    } else {
+      thumb.append(w.image ? image(w.image, w.title) : placeholder());
     }
 
-    body.append(site, h3, price, actions);
+    // Texte
+    const body = el("div", "body");
+    body.append(el("span", "site", kind === "perso" ? "Perso" : kind === "lot" ? "Lot" : siteName(w.url)));
+    const h3 = el("h3", null, w.title || "Sans titre");
+    h3.title = w.title || "";
+    body.append(h3);
+    if (w.rating) body.append(stars(w.rating));
+    if (w.note) {
+      const note = el("p", "note");
+      if (kind === "perso") note.append(el("strong", null, "Pourquoi : "));
+      note.append(w.note);
+      body.append(note);
+    }
+
+    if (kind === "lot" && w.items?.length) {
+      const list = el("ul", "lot-list");
+      for (const it of w.items) {
+        const item = el("li");
+        const a = el("a", null, it.title || siteName(it.url));
+        a.href = it.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        item.append(a);
+        if (it.price) item.append(el("span", null, eur.format(it.price)));
+        list.append(item);
+      }
+      body.append(list);
+    }
+
+    // Prix
+    const price = el("div", "price" + (w.price ? "" : " unknown"));
+    if (w.price) {
+      price.append(eur.format(w.price));
+      const itemsSum = kind === "lot" ? (w.items || []).reduce((s, i) => s + (i.price || 0), 0) : 0;
+      if (itemsSum > w.price + 0.01) price.append(" ", el("s", "was", eur.format(itemsSum)));
+    } else price.textContent = kind === "perso" ? "Montant libre" : "Prix inconnu";
+    body.append(price);
+
+    // Boutons
+    const actions = el("div", "actions");
+    if (kind === "product" && w.url) {
+      const a = el("a", "btn", "Voir ↗");
+      a.href = w.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      actions.append(a);
+    }
+    if (isAdmin()) {
+      const edit = el("button", "btn del", "✏️");
+      edit.title = "Modifier";
+      edit.setAttribute("aria-label", "Modifier");
+      edit.onclick = () => editWish(w);
+      const del = el("button", "btn del", "🗑");
+      del.title = "Supprimer";
+      del.setAttribute("aria-label", "Supprimer");
+      del.onclick = () => removeWish(w.id, del);
+      actions.append(edit, del);
+    }
+    if (actions.children.length) body.append(actions);
+
     li.append(thumb, body);
     return li;
   }
 
-  function placeholder() {
-    const s = document.createElement("span");
-    s.className = "placeholder";
-    s.textContent = "🎁";
-    return s;
+  function placeholder(emoji = "🎁") {
+    return el("span", "placeholder", emoji);
   }
 
   // ---------- Actions ----------
@@ -382,25 +434,98 @@
     }
   }
 
-  function editWish(w) {
-    pending = { ...w, editing: true };
-    els.urlInput.value = w.url;
-    showPreview({ ...w, priceCount: 0 });
-    els.pvNote.textContent = "Modification de l'envie.";
-    els.addPanel.scrollIntoView({ behavior: "smooth" });
+  // ---------- Éditeur (article / lot / perso) ----------
+  let kind = "product";
+  let rating = 0;
+  let lotPriceTouched = false;
+
+  const LABELS = {
+    product: { price: "Prix (€)", text: "Note (taille, couleur…)", placeholder: "" },
+    lot: { price: "Prix du lot (€)", text: "Détail de l'offre", placeholder: "ex : 1 acheté = 1 offert" },
+    perso: { price: "Montant (€)", text: "Pourquoi ?", placeholder: "ex : pour mon permis, un voyage…" },
+  };
+
+  // Affiche les éléments dont data-for contient le type choisi
+  function showFor(k) {
+    els.addPanel.querySelectorAll("[data-for]").forEach((e) => {
+      e.hidden = !e.dataset.for.split(" ").includes(k);
+    });
   }
 
-  function showPreview(data) {
+  function setKind(k) {
+    kind = k;
+    els.addPanel.querySelectorAll(".kind-tab").forEach((t) => t.classList.toggle("active", t.dataset.kind === k));
+    showFor(k);
+    els.pvPriceLabel.textContent = LABELS[k].price;
+    els.pvTextLabel.textContent = LABELS[k].text;
+    els.pvText.placeholder = LABELS[k].placeholder;
+  }
+
+  function renderStars() {
+    els.pvStars.replaceChildren(...[1, 2, 3, 4, 5].map((n) => {
+      const b = el("button", "star" + (n <= rating ? " on" : ""), n <= rating ? "★" : "☆");
+      b.type = "button";
+      b.setAttribute("role", "radio");
+      b.setAttribute("aria-checked", String(n === rating));
+      b.setAttribute("aria-label", `${n} sur 5`);
+      b.onclick = () => { rating = rating === n ? 0 : n; renderStars(); };
+      return b;
+    }));
+  }
+
+  function setImage(src) {
+    els.pvImage.src = src || "";
+    els.pvImage.hidden = kind !== "product" || !src;
+  }
+
+  function renderLotItems() {
+    const items = pending?.items || [];
+    els.lotItems.replaceChildren(...items.map((it, i) => {
+      const li = el("li");
+      li.append(it.image ? image(it.image, it.title) : placeholder());
+      const title = el("input");
+      title.value = it.title || "";
+      title.oninput = () => (it.title = title.value);
+      const price = el("input");
+      price.type = "number";
+      price.step = "0.01";
+      price.min = "0";
+      price.placeholder = "Prix";
+      price.value = it.price ?? "";
+      price.oninput = () => { it.price = parsePrice(price.value); syncLotPrice(); };
+      const rm = el("button", "btn del", "✕");
+      rm.type = "button";
+      rm.setAttribute("aria-label", "Retirer du lot");
+      rm.onclick = () => { items.splice(i, 1); renderLotItems(); syncLotPrice(); };
+      li.append(title, price, rm);
+      return li;
+    }));
+    if (!items.length) els.lotItems.append(el("li", "lot-empty", "Ajoute les liens des articles du lot ci-dessus."));
+  }
+
+  // Par défaut le prix du lot = somme des articles (modifiable, ex. 1 acheté 1 offert)
+  function syncLotPrice() {
+    if (lotPriceTouched) return;
+    const sum = (pending?.items || []).reduce((s, i) => s + (i.price || 0), 0);
+    els.pvPrice.value = sum ? Math.round(sum * 100) / 100 : "";
+  }
+
+  function openEditor(data, hint = "") {
+    pending = { ...data, items: data.items ? data.items.map((i) => ({ ...i })) : [] };
+    setKind(kindOf(data));
     els.pvTitle.value = data.title || "";
     els.pvPrice.value = data.price ?? "";
     els.pvImageUrl.value = data.image || "";
-    els.pvImage.src = data.image || "";
-    els.pvImage.hidden = !data.image;
-    const notes = [];
-    if (!data.price) notes.push("Prix introuvable automatiquement, tu peux le saisir.");
-    else if (data.priceCount > 1) notes.push(`Prix moyen calculé sur ${data.priceCount} offres.`);
-    if (!data.image) notes.push("Pas d'image trouvée, tu peux coller un lien d'image.");
-    els.pvNote.textContent = notes.join(" ");
+    els.pvEmoji.value = data.emoji || "💶";
+    els.pvEmojiPreview.textContent = els.pvEmoji.value;
+    els.pvText.value = data.note || "";
+    els.pvTitle.placeholder = kind === "lot" ? "ex : Lot de chargeurs" : kind === "perso" ? "ex : De l'argent" : "";
+    rating = data.rating || 0;
+    lotPriceTouched = kind === "lot" && data.price != null;
+    setImage(data.image);
+    renderStars();
+    renderLotItems();
+    els.pvNote.textContent = hint;
     els.preview.hidden = false;
   }
 
@@ -408,7 +533,25 @@
     pending = null;
     els.preview.hidden = true;
     els.addForm.reset();
+    els.lotForm.reset();
+    setKind("product");
   }
+
+  function editWish(w) {
+    els.urlInput.value = w.url || "";
+    openEditor({ ...w, editing: true }, "Modification de l'envie.");
+    els.addPanel.scrollIntoView({ behavior: "smooth" });
+  }
+
+  els.addPanel.querySelectorAll(".kind-tab").forEach((t) => {
+    t.addEventListener("click", () => {
+      const k = t.dataset.kind;
+      if (pending?.editing && !confirm("Abandonner la modification en cours ?")) return;
+      resetAdd();
+      setKind(k);
+      if (k !== "product") openEditor({ kind: k });
+    });
+  });
 
   els.addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -418,31 +561,70 @@
     els.fetchBtn.textContent = "Recherche…";
     try {
       const data = await scrapeProduct(url);
-      pending = { url, ...data };
-      showPreview(data);
+      const keep = pending?.editing ? { editing: true, id: pending.id, addedAt: pending.addedAt, note: els.pvText.value, rating } : {};
+      const notes = [];
+      if (!data.price) notes.push("Prix introuvable automatiquement, tu peux le saisir.");
+      else if (data.priceCount > 1) notes.push(`Prix moyen calculé sur ${data.priceCount} offres.`);
+      if (!data.image) notes.push("Pas d'image trouvée, tu peux coller un lien d'image.");
+      openEditor({ ...keep, kind: "product", url, title: data.title, image: data.image, price: data.price }, notes.join(" "));
     } finally {
       els.fetchBtn.disabled = false;
       els.fetchBtn.textContent = "Ajouter";
     }
   });
 
-  els.pvImageUrl.addEventListener("input", () => {
-    els.pvImage.src = els.pvImageUrl.value;
-    els.pvImage.hidden = !els.pvImageUrl.value;
+  els.lotForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const url = els.lotUrl.value.trim();
+    if (!url || !pending) return;
+    els.lotAddBtn.disabled = true;
+    els.lotAddBtn.textContent = "Recherche…";
+    try {
+      const data = await scrapeProduct(url);
+      pending.items.push({ url, title: data.title, image: data.image, price: data.price });
+      els.lotForm.reset();
+      renderLotItems();
+      syncLotPrice();
+      els.pvNote.textContent = data.price ? "" : "Prix d'un article introuvable, tu peux le saisir dans la liste.";
+    } finally {
+      els.lotAddBtn.disabled = false;
+      els.lotAddBtn.textContent = "+ Au lot";
+    }
   });
+
+  els.pvPrice.addEventListener("input", () => { if (kind === "lot") lotPriceTouched = true; });
+  els.pvImageUrl.addEventListener("input", () => setImage(els.pvImageUrl.value));
+  els.pvEmoji.addEventListener("input", () => (els.pvEmojiPreview.textContent = els.pvEmoji.value || "💶"));
   els.pvCancel.addEventListener("click", resetAdd);
+
+  function collectFields() {
+    const common = {
+      kind,
+      title: els.pvTitle.value.trim(),
+      price: parsePrice(els.pvPrice.value),
+      note: els.pvText.value.trim() || undefined,
+      rating: rating || undefined,
+    };
+    if (kind === "product") {
+      const url = els.urlInput.value.trim() || pending.url;
+      return { ...common, url, title: common.title || siteName(url), image: els.pvImageUrl.value.trim() };
+    }
+    if (kind === "lot") {
+      const items = pending.items.filter((i) => i.url);
+      if (!items.length) throw new Error("ajoute au moins un article au lot.");
+      return { ...common, title: common.title || `Lot de ${items.length} articles`, items };
+    }
+    if (!common.title) throw new Error("donne un nom à cette envie.");
+    return { ...common, emoji: els.pvEmoji.value.trim() || "💶" };
+  }
 
   els.pvSave.addEventListener("click", async () => {
     if (!pending) return;
-    const fields = {
-      url: els.urlInput.value.trim() || pending.url,
-      title: els.pvTitle.value.trim() || siteName(pending.url),
-      image: els.pvImageUrl.value.trim(),
-      price: parsePrice(els.pvPrice.value),
-    };
+    let fields;
+    try { fields = collectFields(); } catch (e) { toast("Oups : " + e.message); return; }
     const editing = pending.editing;
     const next = editing
-      ? wishes.map((w) => (w.id === pending.id ? { ...w, ...fields } : w))
+      ? wishes.map((w) => (w.id === pending.id ? { id: w.id, addedAt: w.addedAt, ...fields } : w))
       : [...wishes, { id: crypto.randomUUID?.() || String(Date.now()), ...fields, addedAt: new Date().toISOString() }];
     els.pvSave.disabled = true;
     try {
