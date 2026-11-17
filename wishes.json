@@ -50,5 +50,28 @@
     "url": "https://www.pullandbear.com/fr/coupevent-leger-a-capuche-l07720504?cS=800&pelement=748862861",
     "image": "",
     "addedAt": "2026-11-17T18:09:23.900Z"
+  },
+  {
+    "id": "f63057fe-ec3a-43b2-af24-7f5f79f64f13",
+    "kind": "lot",
+    "title": "lot 1 achete 1 offert avec black friday si plus loffre pas la peine dacheter",
+    "price": 75,
+    "note": "s la veste et le jean aussi",
+    "rating": 4,
+    "items": [
+      {
+        "url": "https://www.rvxstudio.xyz/products/veste-en-cuir-rose?variant=50685027287381",
+        "title": "rvxstudio.xyz",
+        "image": "",
+        "price": null
+      },
+      {
+        "url": "https://www.rvxstudio.xyz/products/jean-baggy-fit-gris",
+        "title": "rvxstudio.xyz",
+        "image": "",
+        "price": null
+      }
+    ],
+    "addedAt": "2026-11-17T18:12:13.184Z"
   }
 ]
