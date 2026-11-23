@@ -93,5 +93,27 @@
     "rating": 3,
     "emoji": "💶",
     "addedAt": "2026-11-17T18:14:39.150Z"
+  },
+  {
+    "id": "121f9d92-c3ac-4401-b81a-e1b8749c9e33",
+    "kind": "lot",
+    "title": "skincare",
+    "price": 30,
+    "rating": 3,
+    "items": [
+      {
+        "url": "https://www.redcare-pharmacie.fr/beaute/F00222341/cerave-creme-lavante-hydratante-visage-et-corps-pour-les-peaux-seches-a-tres-seches-236ml.htm?adword=google-product&expa=gglp&adword=google-product/1-FR-NK/F00222341&gad_source=1&gad_campaignid=21495613197&gbraid=0AAAAAC-YBBIRDoiz7GvPPqilOhHtNqTBU&gclid=CjwKCAiA5Y_YBhBbEiwAK5Dl7YAIM4p9-sFr9MzUPHfYfZ-eCqppkitwGH4i7OtuJR86cAxztmNUZxoC-X4QAvD_BwE",
+        "title": "Crème Lavante Hydratante visage et corps pour les peaux sèches à très sèches 236ml",
+        "image": "https://cdn.redcare-pharmacie.fr/images/F00/222/341/F00222341-p1.jpg",
+        "price": 6.15
+      },
+      {
+        "url": "https://www.redcare-pharmacie.fr/beaute/F00579479/la-roche-posay-hyalu-b5-serum-suractive.htm?adword=google-product&expa=gglp&adword=google-product/1-FR-NK/F00579479&gad_source=1&gad_campaignid=21495613197&gbraid=0AAAAAC-YBBIRDoiz7GvPPqilOhHtNqTBU&gclid=CjwKCAiA5Y_YBhBbEiwAK5Dl7UX9lMtJKhdmDQTTlG3-CEq4QE9LeuUHdxAO0b1FWFLmCjH_HOZnphoC9W8QAvD_BwE",
+        "title": "La Roche Posay Hyalu B5 Sérum Suractivé Concentré anti-rides réparateur repulpant 30ml",
+        "image": "https://cdn.redcare-pharmacie.fr/images/F00/579/479/F00579479-p1.jpg",
+        "price": 25.11
+      }
+    ],
+    "addedAt": "2026-11-23T13:22:34.019Z"
   }
 ]
