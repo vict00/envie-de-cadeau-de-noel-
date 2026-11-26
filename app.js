@@ -324,7 +324,7 @@
     const total = wishes.reduce((s, w) => s + (w.price || 0), 0);
     const n = wishes.length;
     els.summary.textContent = n
-      ? `${n} envie${n > 1 ? "s" : ""} · environ ${eur.format(total)} au total`
+      ? `${n} envie${n > 1 ? "s" : ""}, environ ${eur.format(total)} au total.`
       : "La liste est vide pour le moment";
   }
 
@@ -333,6 +333,32 @@
     if (className) e.className = className;
     if (text != null) e.textContent = text;
     return e;
+  }
+
+  // Petites icônes dessinées (remplacent les emojis)
+  const ICONS = {
+    gift: '<path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.5-3-5-3-5-1s3 1 5 1zm0 0c1.5-3 5-3 5-1s-3 1-5 1z"/>',
+    box: '<path d="M3 8l9-4 9 4-9 4zM3 8v9l9 4 9-4V8M12 12v9"/>',
+    idea: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
+    edit: '<path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/>',
+    trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',
+    close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  };
+  function icon(name) {
+    const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("viewBox", "0 0 24 24");
+    s.setAttribute("aria-hidden", "true");
+    s.setAttribute("class", "icon");
+    s.innerHTML = ICONS[name];
+    return s;
+  }
+  function iconBtn(name, label) {
+    const b = el("button", "btn del");
+    b.type = "button";
+    b.title = label;
+    b.setAttribute("aria-label", label);
+    b.append(icon(name));
+    return b;
   }
 
   function image(src, alt) {
@@ -355,16 +381,16 @@
   function card(w, readOnly = false) {
     const kind = kindOf(w);
     const li = el("li", `card kind-${kind}` + (w.rating === 5 ? " top" : ""));
-    if (w.rating === 5) li.append(el("span", "ribbon", "❤️ Très envie"));
+    if (w.rating === 5) li.append(el("span", "ribbon", "Très envie"));
 
     // Visuel
     const thumb = el("div", "thumb");
     if (kind === "lot") {
-      mosaic(thumb, w.items || [], "📦");
+      mosaic(thumb, w.items || [], "box");
       thumb.append(el("span", "badge", `Lot de ${(w.items || []).length}`));
     } else if (kind === "idea") {
-      mosaic(thumb, w.links || [], "💡");
-      thumb.append(el("span", "badge idea", "💡 Idée"));
+      mosaic(thumb, w.links || [], "idea");
+      thumb.append(el("span", "badge idea", "Idée"));
     } else if (kind === "perso") {
       thumb.append(el("span", "placeholder big", w.emoji || "💶"));
     } else {
@@ -391,7 +417,7 @@
       for (const it of w.items) {
         const item = el("li");
         if (it.kind === "idea") {
-          const open = el("button", "idea-name", `💡 ${it.title || "Idée"}`);
+          const open = el("button", "idea-name", `Idée : ${it.title || "sans titre"}`);
           open.type = "button";
           open.title = "Voir l'idée";
           open.onclick = () => showIdea(it);
@@ -426,7 +452,7 @@
     // Boutons
     const actions = el("div", "actions");
     if (kind === "product" && w.url) {
-      const a = el("a", "btn", "Voir ↗");
+      const a = el("a", "btn see", "Voir l’article");
       a.href = w.url;
       a.target = "_blank";
       a.rel = "noopener noreferrer";
@@ -434,19 +460,13 @@
     }
     if (isAdmin() && !readOnly) {
       if (kind === "product" || kind === "idea") {
-        const toLot = el("button", "btn del", "📦");
-        toLot.title = "Ajouter à un lot";
-        toLot.setAttribute("aria-label", "Ajouter à un lot");
+        const toLot = iconBtn("box", "Ajouter à un lot");
         toLot.onclick = () => askLot(w);
         actions.append(toLot);
       }
-      const edit = el("button", "btn del", "✏️");
-      edit.title = "Modifier";
-      edit.setAttribute("aria-label", "Modifier");
+      const edit = iconBtn("edit", "Modifier");
       edit.onclick = () => editWish(w);
-      const del = el("button", "btn del", "🗑");
-      del.title = "Supprimer";
-      del.setAttribute("aria-label", "Supprimer");
+      const del = iconBtn("trash", "Supprimer");
       del.onclick = () => removeWish(w.id, del);
       actions.append(edit, del);
     }
@@ -463,8 +483,10 @@
   // Un clic à côté de la carte ferme la fenêtre
   els.ideaDialog.addEventListener("click", (e) => { if (e.target === els.ideaDialog) els.ideaDialog.close(); });
 
-  function placeholder(emoji = "🎁") {
-    return el("span", "placeholder", emoji);
+  function placeholder(name = "gift") {
+    const p = el("span", "placeholder");
+    p.append(icon(ICONS[name] ? name : "gift"));
+    return p;
   }
 
   // ---------- Actions ----------
@@ -541,7 +563,7 @@
     els.lotItems.replaceChildren(...items.map((it, i) => {
       const li = el("li");
       const src = imageOf(it);
-      li.append(src ? image(src, it.title) : placeholder(it.kind === "idea" ? "💡" : "🎁"));
+      li.append(src ? image(src, it.title) : placeholder(it.kind === "idea" ? "idea" : "gift"));
       const title = el("input");
       title.value = it.title || "";
       title.oninput = () => (it.title = title.value);
@@ -556,9 +578,7 @@
         price.oninput = () => { it.price = parsePrice(price.value); syncLotPrice(); };
         li.append(price);
       }
-      const rm = el("button", "btn del", "✕");
-      rm.type = "button";
-      rm.setAttribute("aria-label", "Retirer");
+      const rm = iconBtn("close", "Retirer");
       rm.onclick = () => { items.splice(i, 1); renderLotItems(); syncLotPrice(); fillLotPick(); };
       li.append(rm);
       return li;
@@ -579,8 +599,8 @@
     const taken = new Set((pending?.items || []).map((i) => i.fromId));
     const options = wishes.filter((w) => ["product", "idea"].includes(kindOf(w)) && !taken.has(w.id));
     els.lotPick.replaceChildren(
-      new Option("➕ Ajouter une envie déjà dans ma liste…", ""),
-      ...options.map((w) => new Option(`${kindOf(w) === "idea" ? "💡" : "🔗"} ${w.title}`, w.id)),
+      new Option("Ajouter une envie déjà dans ma liste…", ""),
+      ...options.map((w) => new Option(`${kindOf(w) === "idea" ? "Idée : " : ""}${w.title}`, w.id)),
     );
     els.lotPick.disabled = !options.length;
   }
@@ -606,8 +626,8 @@
     lotTarget = w;
     els.lotDialogText.textContent = `Dans quel lot mettre « ${w.title} » ?`;
     els.lotDialogSelect.replaceChildren(
-      ...lots.map((l) => new Option(`📦 ${l.title}`, l.id)),
-      new Option("➕ Nouveau lot", ""),
+      ...lots.map((l) => new Option(l.title, l.id)),
+      new Option("Nouveau lot", ""),
     );
     els.lotDialog.showModal();
   }
@@ -774,7 +794,7 @@
     try {
       await saveWishes(next, `${editing ? "Modifie" : "Ajoute"} : ${fields.title}`);
       resetAdd();
-      toast(editing ? "Envie modifiée" : "Envie ajoutée 🎄");
+      toast(editing ? "Envie modifiée" : "Envie ajoutée");
     } catch (e) {
       toast("Échec : " + e.message);
     } finally {
@@ -790,7 +810,7 @@
   function updateAdminUi() {
     els.addPanel.hidden = !isAdmin();
     els.adminBtn.hidden = !isAdmin() && !adminLink;
-    els.adminBtn.textContent = isAdmin() ? "🔒 Quitter le mode gestion" : "🔑 Gérer ma liste";
+    els.adminBtn.textContent = isAdmin() ? "Quitter le mode gestion" : "Gérer ma liste";
     render();
   }
 

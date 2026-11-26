@@ -4,47 +4,61 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mes envies de Noël</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+  <meta name="description" content="Ma liste d’envies pour Noël 2026 : les articles, les idées et leur prix, pour choisir un cadeau.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Archivo:wght@400;500;600&family=Archivo+Narrow:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
-  <div class="snow" aria-hidden="true"></div>
-
-  <header class="hero">
-    <p class="eyebrow">Noël 2026</p>
-    <h1>Mes envies de Noël</h1>
-    <p class="summary" id="summary">Chargement…</p>
+  <header class="masthead container">
+    <div class="masthead-bar">
+      <time datetime="2026-12-25">Noël 2026</time>
+    </div>
+    <div class="masthead-main">
+      <h1>Mes envies de Noël</h1>
+      <div class="masthead-side">
+        <p class="summary" id="summary" role="status">Chargement…</p>
+        <label class="sort">Trier par
+          <select id="sortSelect">
+            <option value="rating">Les plus importantes</option>
+            <option value="recent">Plus récentes</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+          </select>
+        </label>
+      </div>
+    </div>
   </header>
 
-  <main>
+  <main class="container">
     <section class="add-panel" id="addPanel" hidden>
       <div class="kind-tabs" role="tablist">
-        <button type="button" class="kind-tab active" data-kind="product">🔗 Article</button>
-        <button type="button" class="kind-tab" data-kind="idea">💡 Idée</button>
-        <button type="button" class="kind-tab" data-kind="lot">📦 Lot</button>
-        <button type="button" class="kind-tab" data-kind="perso">💶 Perso</button>
+        <button type="button" class="kind-tab active" data-kind="product">Article</button>
+        <button type="button" class="kind-tab" data-kind="idea">Idée</button>
+        <button type="button" class="kind-tab" data-kind="lot">Lot</button>
+        <button type="button" class="kind-tab" data-kind="perso">Perso</button>
       </div>
 
       <form id="addForm" class="add-form" data-for="product">
-        <input type="url" id="urlInput" placeholder="Colle le lien d'un produit…" required>
+        <input type="url" id="urlInput" placeholder="Colle le lien d’un produit…" required>
         <button type="submit" class="btn primary" id="fetchBtn">Ajouter</button>
       </form>
-      <p class="kind-hint" data-for="idea" hidden>Une idée générale pour donner le style : décris-la et ajoute des liens d'exemple si tu veux.</p>
+      <p class="kind-hint" data-for="idea" hidden>Une idée générale pour donner le style : décris-la et ajoute des liens d’exemple si tu veux.</p>
       <form id="lotForm" class="add-form" data-for="lot idea" hidden>
-        <input type="url" id="lotUrl" placeholder="Colle le lien d'un article du lot…" required>
+        <input type="url" id="lotUrl" placeholder="Colle le lien d’un article du lot…" required>
         <button type="submit" class="btn primary" id="lotAddBtn">+ Au lot</button>
       </form>
       <select id="lotPick" class="lot-pick" data-for="lot" hidden>
-        <option value="">➕ Ajouter une envie déjà dans ma liste…</option>
+        <option value="">Ajouter une envie déjà dans ma liste…</option>
       </select>
-      <p class="kind-hint" data-for="perso" hidden>Une envie sans lien : de l'argent, une sortie, une expérience…</p>
+      <p class="kind-hint" data-for="perso" hidden>Une envie sans lien : de l’argent, une sortie, une expérience…</p>
 
       <div class="preview" id="preview" hidden>
         <div class="pv-visual" data-for="product perso">
-          <img id="pvImage" alt="" data-for="product">
-          <span class="pv-emoji" id="pvEmojiPreview" data-for="perso">💶</span>
+          <img id="pvImage" src="data:," alt="" data-for="product" hidden>
+          <span class="pv-emoji" id="pvEmojiPreview" data-for="perso"></span>
         </div>
         <div class="pv-fields">
           <ul class="lot-items" id="lotItems" data-for="lot idea"></ul>
@@ -52,7 +66,7 @@
           <div class="pv-row">
             <label><span id="pvPriceLabel">Prix (€)</span><input id="pvPrice" type="number" step="0.01" min="0" placeholder="?"></label>
             <label class="grow" data-for="product">Image (lien)<input id="pvImageUrl" type="url"></label>
-            <label data-for="perso">Emoji<input id="pvEmoji" type="text" maxlength="4" value="💶"></label>
+            <label data-for="perso">Symbole<input id="pvEmoji" type="text" maxlength="4"></label>
           </div>
           <label><span id="pvTextLabel">Note</span><textarea id="pvText" rows="2"></textarea></label>
           <div class="stars-field">
@@ -62,29 +76,18 @@
           <p class="pv-note" id="pvNote"></p>
           <div class="pv-actions">
             <button class="btn ghost" type="button" id="pvCancel">Annuler</button>
-            <button class="btn primary" type="button" id="pvSave">Enregistrer l'envie</button>
+            <button class="btn primary" type="button" id="pvSave">Enregistrer l’envie</button>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="toolbar">
-      <label class="sort">Trier
-        <select id="sortSelect">
-          <option value="rating">Les plus importantes</option>
-          <option value="recent">Plus récentes</option>
-          <option value="price-asc">Prix croissant</option>
-          <option value="price-desc">Prix décroissant</option>
-        </select>
-      </label>
-    </div>
-
     <ul class="grid" id="grid"></ul>
-    <p class="empty" id="empty" hidden>Aucune envie pour l'instant 🎄</p>
+    <p class="empty" id="empty" hidden>Aucune envie pour l’instant.</p>
   </main>
 
-  <footer>
-    <button class="link-btn" id="adminBtn" hidden>🔑 Gérer ma liste</button>
+  <footer class="colophon container">
+    <button class="link-btn" id="adminBtn" type="button" hidden>Gérer ma liste</button>
   </footer>
 
   <dialog id="tokenDialog">
@@ -102,7 +105,7 @@
 
   <dialog id="ideaDialog" class="idea-dialog">
     <form method="dialog">
-      <button class="close-btn" aria-label="Fermer">✕</button>
+      <button class="close-btn" aria-label="Fermer"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
     </form>
     <ul id="ideaDialogBody" class="grid single"></ul>
   </dialog>
@@ -121,7 +124,7 @@
 
   <div class="toast" id="toast" role="status"></div>
 
-  <script src="config.js?v=5"></script>
-  <script src="app.js?v=5"></script>
+  <script src="config.js?v=6"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
