@@ -53,6 +53,7 @@
   },
   {
     "id": "f63057fe-ec3a-43b2-af24-7f5f79f64f13",
+    "addedAt": "2026-11-17T18:12:13.184Z",
     "kind": "lot",
     "title": "lot 1 achete 1 offert avec black friday si plus loffre pas la peine dacheter",
     "price": 75,
@@ -71,8 +72,7 @@
         "image": "",
         "price": null
       }
-    ],
-    "addedAt": "2026-11-17T18:12:13.184Z"
+    ]
   },
   {
     "id": "4a082f89-638f-43b1-8c24-f0f1fbf3add8",
