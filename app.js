@@ -318,7 +318,7 @@
     if (mode === "price-asc") sorted.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
     if (mode === "price-desc") sorted.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
 
-    els.grid.replaceChildren(...sorted.map(card));
+    els.grid.replaceChildren(...sorted.map((w) => card(w)));
     els.empty.hidden = wishes.length > 0;
 
     const total = wishes.reduce((s, w) => s + (w.price || 0), 0);
