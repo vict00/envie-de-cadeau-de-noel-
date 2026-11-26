@@ -183,13 +183,13 @@
   },
   {
     "id": "17545c29-b0dc-4034-8bf7-fa47923af299",
+    "addedAt": "2026-11-26T09:25:53.488Z",
     "kind": "product",
     "title": "bershka.com",
-    "price": 15,
+    "price": null,
     "rating": 3,
     "url": "https://www.bershka.com/fr/%C3%A9charpe-%C3%A9toiles-c0p227994912.html?colorId=802",
-    "image": "",
-    "addedAt": "2026-11-26T09:25:53.488Z"
+    "image": "https://static.bershka.net/assets/public/f278/6949/8d224a52b494/1da794c237e5/03393423802-a4o/03393423802-a4o.jpg?ts=1787822140308&w=850"
   },
   {
     "id": "1ff5ba52-fc6c-4106-9c5c-e2034e2a004e",
