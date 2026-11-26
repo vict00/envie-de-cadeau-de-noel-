@@ -179,5 +179,15 @@
     "url": "https://www.bershka.com/fr/%C3%A9charpe-maxi-lettering-c0p227994909.html?colorId=420",
     "image": "",
     "addedAt": "2026-11-26T09:25:25.337Z"
+  },
+  {
+    "id": "17545c29-b0dc-4034-8bf7-fa47923af299",
+    "kind": "product",
+    "title": "bershka.com",
+    "price": 15,
+    "rating": 3,
+    "url": "https://www.bershka.com/fr/%C3%A9charpe-%C3%A9toiles-c0p227994912.html?colorId=802",
+    "image": "",
+    "addedAt": "2026-11-26T09:25:53.488Z"
   }
 ]
