@@ -1,7 +1,7 @@
 /* Hallmark · shape: app screen · genre: editorial · theme: Solstice (deal 1/3, seed une-liste-envies-partag-ccf2·98418e3d·2026-11-26·r0) · redesign: full
- * nav: kept, a masthead with the date, the title, the total and the sort · signature: the most-wanted wish set twice the size at the head of the list, product shots printed into the cream · states: loading, empty, full, admin editor · solstice: long-light
+ * nav: kept, a masthead with the date, the title, the total and the sort · signature: one ruled frame per wish, every picture on the same square, product shots printed into the cream · states: loading, empty, full, admin editor · solstice: long-light
  * axes: light/high-contrast-serif/warm · posture: restrained · contrast: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H5 E4 S4 R4 V4 · weakest: P, a list page argues little; let the first wish lead at double size so the order itself says what matters most */
+/* Hallmark · pre-emit critique: P4 H5 E4 S4 R4 V4 · weakest: P, a list page argues little; every wish sits in its own ruled frame at one size, so the list reads as a clean almanac table */
 @import url("./tokens.css");
 @import url("./base.css");
 
@@ -188,35 +188,37 @@ select { cursor: pointer; }
   grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-auto-flow: row dense;
 }
-.card { position: relative; display: flex; flex-direction: column; min-width: 0; }
+.card {
+  position: relative; display: flex; flex-direction: column; min-width: 0;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid color-mix(in oklab, var(--color-ink) 28%, transparent);
+  border-top: var(--rule-bar) solid var(--color-ink);
+}
+.card.top { box-shadow: var(--shadow-card); }
 
-/* Signature: the first wish of the list with a photo, set twice the size */
-.grid:not(.single) > .card:has(.thumb > img):not(.card:has(.thumb > img) ~ .card) { grid-column: span 2; grid-row: span 2; }
-.grid:not(.single) > .card:has(.thumb > img):not(.card:has(.thumb > img) ~ .card) h3 { font-size: var(--text-3xl); -webkit-line-clamp: 4; }
-.grid:not(.single) > .card:has(.thumb > img):not(.card:has(.thumb > img) ~ .card) .price { font-size: var(--text-3xl); font-variant-numeric: tabular-nums; }
 
 .card .thumb {
   position: relative; aspect-ratio: 1;
   display: grid; place-items: center;
-  background: var(--color-paper-2);
-  outline: var(--rule-hair) solid var(--thumb-ink); outline-offset: -1px;
+  background: var(--color-paper);
+  border-bottom: var(--rule-hair) solid color-mix(in oklab, var(--color-ink) 18%, transparent);
   overflow: hidden;
 }
 .card .thumb img {
-  width: 100%; height: 100%; object-fit: contain;
-  padding: 8%; mix-blend-mode: multiply;
+  width: 100%; height: 100%; object-fit: contain; object-position: center;
+  padding: 10%; mix-blend-mode: multiply;
 }
-.card.top .thumb { box-shadow: var(--shadow-card); }
 .placeholder { display: grid; place-items: center; width: 100%; height: 100%; color: var(--color-rule); }
 .placeholder .icon { width: 28%; height: 28%; stroke-width: 1.2; }
 .placeholder.big { font-size: clamp(3rem, 7vw, 5rem); line-height: 1; }
 .kind-perso .thumb { background: var(--color-paper-3); }
 
-.thumb.mosaic { gap: var(--space-2xs); place-items: stretch; background: var(--color-paper-2); }
+.thumb.mosaic { gap: var(--space-2xs); place-items: stretch; background: var(--color-paper); }
 .thumb.mosaic.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .thumb.mosaic.n3, .thumb.mosaic.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 .thumb.mosaic.n3 img:first-child { grid-row: span 2; }
-.thumb.mosaic img { background: var(--color-paper-2); padding: 10%; min-height: 0; }
+.card .thumb:not(.mosaic) > img { position: absolute; inset: 0; }
+.thumb.mosaic img { background: var(--color-paper); padding: 10%; min-height: 0; }
 
 .ribbon, .badge {
   position: absolute; z-index: 2;
@@ -227,7 +229,7 @@ select { cursor: pointer; }
 .badge { right: 0; bottom: 0; }
 .badge.idea { background: var(--color-paper); color: var(--color-ink); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-ink); }
 
-.card .body { display: flex; flex-direction: column; gap: var(--space-xs); flex: 1; padding-top: var(--space-md); }
+.card .body { display: flex; flex-direction: column; gap: var(--space-xs); flex: 1; padding: var(--space-md); }
 .card .site { color: var(--color-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .card h3 {
   max-width: none;
@@ -326,8 +328,6 @@ dialog::backdrop { background: var(--scrim); }
   .masthead-main { grid-template-columns: minmax(0, 1fr); padding-top: var(--space-xl); }
   .masthead-side { justify-self: start; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xl) var(--space-md); }
-  .grid:not(.single) > .card:has(.thumb > img):not(.card:has(.thumb > img) ~ .card) { grid-row: span 1; }
-  .grid:not(.single) > .card:has(.thumb > img):not(.card:has(.thumb > img) ~ .card) h3, .grid:not(.single) > .card:has(.thumb > img):not(.card:has(.thumb > img) ~ .card) .price { font-size: var(--text-2xl); font-variant-numeric: tabular-nums; }
   .card h3 { font-size: var(--text-lg); }
   .card .price { font-size: var(--text-xl); }
   .add-panel { padding: var(--space-lg); }
