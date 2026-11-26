@@ -31,6 +31,7 @@
     pvPriceLabel: $("pvPriceLabel"), pvText: $("pvText"), pvTextLabel: $("pvTextLabel"), pvStars: $("pvStars"),
     pvEmoji: $("pvEmoji"), pvEmojiPreview: $("pvEmojiPreview"),
     lotForm: $("lotForm"), lotUrl: $("lotUrl"), lotAddBtn: $("lotAddBtn"), lotItems: $("lotItems"), lotPick: $("lotPick"),
+    ideaDialog: $("ideaDialog"), ideaDialogBody: $("ideaDialogBody"),
     lotDialog: $("lotDialog"), lotDialogText: $("lotDialogText"), lotDialogSelect: $("lotDialogSelect"), lotDialogOk: $("lotDialogOk"),
     sortSelect: $("sortSelect"), adminBtn: $("adminBtn"),
     tokenDialog: $("tokenDialog"), tokenInput: $("tokenInput"), tokenError: $("tokenError"), tokenSave: $("tokenSave"),
@@ -350,7 +351,8 @@
     return s;
   }
 
-  function card(w) {
+  // readOnly : carte affichée seule dans une fenêtre (ex. une idée rangée dans un lot)
+  function card(w, readOnly = false) {
     const kind = kindOf(w);
     const li = el("li", `card kind-${kind}` + (w.rating === 5 ? " top" : ""));
     if (w.rating === 5) li.append(el("span", "ribbon", "❤️ Très envie"));
@@ -389,11 +391,11 @@
       for (const it of w.items) {
         const item = el("li");
         if (it.kind === "idea") {
-          const first = (it.links || [])[0];
-          const name = `💡 ${it.title || "Idée"}`;
-          const e = first ? link(first.url, name) : el("span", "idea-name", name);
-          if (it.note) e.title = it.note;
-          item.append(e);
+          const open = el("button", "idea-name", `💡 ${it.title || "Idée"}`);
+          open.type = "button";
+          open.title = "Voir l'idée";
+          open.onclick = () => showIdea(it);
+          item.append(open);
         } else item.append(link(it.url, it.title || siteName(it.url)));
         if (it.price) item.append(el("span", null, eur.format(it.price)));
         list.append(item);
@@ -430,7 +432,7 @@
       a.rel = "noopener noreferrer";
       actions.append(a);
     }
-    if (isAdmin()) {
+    if (isAdmin() && !readOnly) {
       if (kind === "product" || kind === "idea") {
         const toLot = el("button", "btn del", "📦");
         toLot.title = "Ajouter à un lot";
@@ -453,6 +455,13 @@
     li.append(thumb, body);
     return li;
   }
+
+  function showIdea(idea) {
+    els.ideaDialogBody.replaceChildren(card({ ...idea, kind: "idea" }, true));
+    els.ideaDialog.showModal();
+  }
+  // Un clic à côté de la carte ferme la fenêtre
+  els.ideaDialog.addEventListener("click", (e) => { if (e.target === els.ideaDialog) els.ideaDialog.close(); });
 
   function placeholder(emoji = "🎁") {
     return el("span", "placeholder", emoji);

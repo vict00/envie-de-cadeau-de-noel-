@@ -280,3 +280,17 @@ textarea:focus { outline: 2px solid var(--green); outline-offset: 1px; }
 .idea-name { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .lot-pick { width: 100%; margin-top: 8px; }
 #lotDialogSelect { width: 100%; }
+
+/* Fenêtre d'une idée rangée dans un lot */
+.idea-dialog { padding: 0; max-width: 360px; max-height: 90vh; overflow: auto; background: transparent; border: 0; box-shadow: none; }
+.idea-dialog .grid.single { grid-template-columns: 1fr; }
+.idea-dialog .card:hover { transform: none; }
+.close-btn {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: var(--shadow); font-size: 1rem;
+}
+button.idea-name {
+  background: none; border: 0; padding: 0; font: inherit; cursor: pointer; text-align: left;
+  color: var(--green); text-decoration: underline;
+}
