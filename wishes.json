@@ -190,5 +190,31 @@
     "url": "https://www.bershka.com/fr/%C3%A9charpe-%C3%A9toiles-c0p227994912.html?colorId=802",
     "image": "",
     "addedAt": "2026-11-26T09:25:53.488Z"
+  },
+  {
+    "id": "1ff5ba52-fc6c-4106-9c5c-e2034e2a004e",
+    "kind": "idea",
+    "title": "ceinture",
+    "price": null,
+    "note": "ceinture dans le style de celle ci",
+    "rating": 3,
+    "links": [
+      {
+        "url": "https://fr.pinterest.com/pin/878201996111038814/",
+        "title": "fr.pinterest.com",
+        "image": ""
+      },
+      {
+        "url": "https://fr.pinterest.com/pin/1066649493024552125/",
+        "title": "fr.pinterest.com",
+        "image": ""
+      },
+      {
+        "url": "https://fr.nihaojewelry.com/ladies-american-retro-decorative-skirt-belt-shiny-star-individual-leather-belt-subculture-black-pants-belt-punk-street-style-nh11454458.html?src=feed&utm_source=ADS&utm_medium=PLA&utm_campaign=22793143320&gad_source=1&gad_campaignid=22793143320&gbraid=0AAAAAClm9aNivPenoGuh_iByLb6AYOhym&gclid=CjwKCAiAzp_YBhAJEiwASf8kHae44dnn5WS3GVdi_weqfa3QQooA3GmzOJMypG5Zj-WP3pY6s899IBoC5AcQAvD_BwE",
+        "title": "fr.nihaojewelry.com",
+        "image": ""
+      }
+    ],
+    "addedAt": "2026-11-26T09:57:42.447Z"
   }
 ]
