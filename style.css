@@ -207,8 +207,8 @@ select { cursor: pointer; }
   overflow: hidden;
 }
 .card .thumb img {
-  width: 100%; height: 100%; object-fit: contain; object-position: center;
-  padding: 10%; mix-blend-mode: multiply;
+  width: 100%; height: 100%; object-fit: cover; object-position: center;
+  mix-blend-mode: multiply;
 }
 .placeholder { display: grid; place-items: center; width: 100%; height: 100%; color: var(--color-rule); }
 .placeholder .icon { width: 28%; height: 28%; stroke-width: 1.2; }
@@ -220,7 +220,7 @@ select { cursor: pointer; }
 .thumb.mosaic.n3, .thumb.mosaic.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 .thumb.mosaic.n3 img:first-child { grid-row: span 2; }
 .card .thumb:not(.mosaic) > img { position: absolute; inset: 0; }
-.thumb.mosaic img { background: var(--color-paper); padding: 10%; min-height: 0; }
+.thumb.mosaic img { background: var(--color-paper); min-height: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .ribbon, .badge {
   position: absolute; z-index: 2;
