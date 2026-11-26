@@ -272,3 +272,11 @@ textarea:focus { outline: 2px solid var(--green); outline-offset: 1px; }
 .lot-list span { color: var(--muted); flex-shrink: 0; }
 .lot-items .btn.del { flex-shrink: 0; background: transparent; color: var(--muted); border: 1px solid var(--line); padding: 8px 10px; }
 .lot-items .btn.del:hover { color: var(--red); border-color: var(--red); }
+
+/* ---------- Idées ---------- */
+.badge.idea { background: var(--gold); color: #1f2a24; }
+.kind-idea .thumb:not(.mosaic) { background: linear-gradient(135deg, #fdf3dc, #e3efe8); }
+.examples-title { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.idea-name { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.lot-pick { width: 100%; margin-top: 8px; }
+#lotDialogSelect { width: 100%; }

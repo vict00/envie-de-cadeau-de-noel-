@@ -7,7 +7,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <div class="snow" aria-hidden="true"></div>
@@ -22,6 +22,7 @@
     <section class="add-panel" id="addPanel" hidden>
       <div class="kind-tabs" role="tablist">
         <button type="button" class="kind-tab active" data-kind="product">🔗 Article</button>
+        <button type="button" class="kind-tab" data-kind="idea">💡 Idée</button>
         <button type="button" class="kind-tab" data-kind="lot">📦 Lot</button>
         <button type="button" class="kind-tab" data-kind="perso">💶 Perso</button>
       </div>
@@ -30,10 +31,14 @@
         <input type="url" id="urlInput" placeholder="Colle le lien d'un produit…" required>
         <button type="submit" class="btn primary" id="fetchBtn">Ajouter</button>
       </form>
-      <form id="lotForm" class="add-form" data-for="lot" hidden>
+      <p class="kind-hint" data-for="idea" hidden>Une idée générale pour donner le style : décris-la et ajoute des liens d'exemple si tu veux.</p>
+      <form id="lotForm" class="add-form" data-for="lot idea" hidden>
         <input type="url" id="lotUrl" placeholder="Colle le lien d'un article du lot…" required>
         <button type="submit" class="btn primary" id="lotAddBtn">+ Au lot</button>
       </form>
+      <select id="lotPick" class="lot-pick" data-for="lot" hidden>
+        <option value="">➕ Ajouter une envie déjà dans ma liste…</option>
+      </select>
       <p class="kind-hint" data-for="perso" hidden>Une envie sans lien : de l'argent, une sortie, une expérience…</p>
 
       <div class="preview" id="preview" hidden>
@@ -42,7 +47,7 @@
           <span class="pv-emoji" id="pvEmojiPreview" data-for="perso">💶</span>
         </div>
         <div class="pv-fields">
-          <ul class="lot-items" id="lotItems" data-for="lot"></ul>
+          <ul class="lot-items" id="lotItems" data-for="lot idea"></ul>
           <label>Nom<input id="pvTitle" type="text"></label>
           <div class="pv-row">
             <label><span id="pvPriceLabel">Prix (€)</span><input id="pvPrice" type="number" step="0.01" min="0" placeholder="?"></label>
@@ -95,9 +100,21 @@
     </form>
   </dialog>
 
+  <dialog id="lotDialog">
+    <form method="dialog" class="token-form">
+      <h2>Ajouter à un lot</h2>
+      <p id="lotDialogText"></p>
+      <select id="lotDialogSelect"></select>
+      <div class="pv-actions">
+        <button class="btn ghost" value="cancel">Annuler</button>
+        <button class="btn primary" id="lotDialogOk" value="ok">Continuer</button>
+      </div>
+    </form>
+  </dialog>
+
   <div class="toast" id="toast" role="status"></div>
 
-  <script src="config.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="config.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

@@ -30,7 +30,8 @@
     pvImageUrl: $("pvImageUrl"), pvNote: $("pvNote"), pvCancel: $("pvCancel"), pvSave: $("pvSave"),
     pvPriceLabel: $("pvPriceLabel"), pvText: $("pvText"), pvTextLabel: $("pvTextLabel"), pvStars: $("pvStars"),
     pvEmoji: $("pvEmoji"), pvEmojiPreview: $("pvEmojiPreview"),
-    lotForm: $("lotForm"), lotUrl: $("lotUrl"), lotAddBtn: $("lotAddBtn"), lotItems: $("lotItems"),
+    lotForm: $("lotForm"), lotUrl: $("lotUrl"), lotAddBtn: $("lotAddBtn"), lotItems: $("lotItems"), lotPick: $("lotPick"),
+    lotDialog: $("lotDialog"), lotDialogText: $("lotDialogText"), lotDialogSelect: $("lotDialogSelect"), lotDialogOk: $("lotDialogOk"),
     sortSelect: $("sortSelect"), adminBtn: $("adminBtn"),
     tokenDialog: $("tokenDialog"), tokenInput: $("tokenInput"), tokenError: $("tokenError"), tokenSave: $("tokenSave"),
     toast: $("toast"),
@@ -289,6 +290,23 @@
 
   // ---------- Render ----------
   const kindOf = (w) => w.kind || "product";
+  // Une idée n'a pas d'image propre : on prend celle de son premier exemple
+  const imageOf = (i) => i.image || (i.links || []).find((l) => l.image)?.image;
+
+  function link(url, text) {
+    const a = el("a", null, text);
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    return a;
+  }
+
+  function mosaic(thumb, entries, emptyEmoji) {
+    const imgs = entries.filter(imageOf).slice(0, 4);
+    if (!imgs.length) return thumb.append(placeholder(emptyEmoji));
+    thumb.classList.add("mosaic", `n${imgs.length}`);
+    imgs.forEach((i) => thumb.append(image(imageOf(i), i.title)));
+  }
 
   function render() {
     const sorted = [...wishes];
@@ -340,12 +358,11 @@
     // Visuel
     const thumb = el("div", "thumb");
     if (kind === "lot") {
-      const imgs = (w.items || []).filter((i) => i.image).slice(0, 4);
-      if (imgs.length) {
-        thumb.classList.add("mosaic", `n${imgs.length}`);
-        imgs.forEach((i) => thumb.append(image(i.image, i.title)));
-      } else thumb.append(placeholder("📦"));
+      mosaic(thumb, w.items || [], "📦");
       thumb.append(el("span", "badge", `Lot de ${(w.items || []).length}`));
+    } else if (kind === "idea") {
+      mosaic(thumb, w.links || [], "💡");
+      thumb.append(el("span", "badge idea", "💡 Idée"));
     } else if (kind === "perso") {
       thumb.append(el("span", "placeholder big", w.emoji || "💶"));
     } else {
@@ -354,7 +371,8 @@
 
     // Texte
     const body = el("div", "body");
-    body.append(el("span", "site", kind === "perso" ? "Perso" : kind === "lot" ? "Lot" : siteName(w.url)));
+    const label = { perso: "Perso", lot: "Lot", idea: "Idée de style" }[kind] || siteName(w.url);
+    body.append(el("span", "site", label));
     const h3 = el("h3", null, w.title || "Sans titre");
     h3.title = w.title || "";
     body.append(h3);
@@ -370,12 +388,25 @@
       const list = el("ul", "lot-list");
       for (const it of w.items) {
         const item = el("li");
-        const a = el("a", null, it.title || siteName(it.url));
-        a.href = it.url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        item.append(a);
+        if (it.kind === "idea") {
+          const first = (it.links || [])[0];
+          const name = `💡 ${it.title || "Idée"}`;
+          const e = first ? link(first.url, name) : el("span", "idea-name", name);
+          if (it.note) e.title = it.note;
+          item.append(e);
+        } else item.append(link(it.url, it.title || siteName(it.url)));
         if (it.price) item.append(el("span", null, eur.format(it.price)));
+        list.append(item);
+      }
+      body.append(list);
+    }
+
+    if (kind === "idea" && w.links?.length) {
+      body.append(el("span", "examples-title", "Exemples :"));
+      const list = el("ul", "lot-list");
+      for (const l of w.links) {
+        const item = el("li");
+        item.append(link(l.url, l.title || siteName(l.url)));
         list.append(item);
       }
       body.append(list);
@@ -384,10 +415,10 @@
     // Prix
     const price = el("div", "price" + (w.price ? "" : " unknown"));
     if (w.price) {
-      price.append(eur.format(w.price));
+      price.append((kind === "idea" ? "≈ " : "") + eur.format(w.price));
       const itemsSum = kind === "lot" ? (w.items || []).reduce((s, i) => s + (i.price || 0), 0) : 0;
       if (itemsSum > w.price + 0.01) price.append(" ", el("s", "was", eur.format(itemsSum)));
-    } else price.textContent = kind === "perso" ? "Montant libre" : "Prix inconnu";
+    } else price.textContent = kind === "perso" ? "Montant libre" : kind === "idea" ? "Budget libre" : "Prix inconnu";
     body.append(price);
 
     // Boutons
@@ -400,6 +431,13 @@
       actions.append(a);
     }
     if (isAdmin()) {
+      if (kind === "product" || kind === "idea") {
+        const toLot = el("button", "btn del", "📦");
+        toLot.title = "Ajouter à un lot";
+        toLot.setAttribute("aria-label", "Ajouter à un lot");
+        toLot.onclick = () => askLot(w);
+        actions.append(toLot);
+      }
       const edit = el("button", "btn del", "✏️");
       edit.title = "Modifier";
       edit.setAttribute("aria-label", "Modifier");
@@ -443,6 +481,12 @@
     product: { price: "Prix (€)", text: "Note (taille, couleur…)", placeholder: "" },
     lot: { price: "Prix du lot (€)", text: "Détail de l'offre", placeholder: "ex : 1 acheté = 1 offert" },
     perso: { price: "Montant (€)", text: "Pourquoi ?", placeholder: "ex : pour mon permis, un voyage…" },
+    idea: { price: "Budget (€, facultatif)", text: "Décris l'idée", placeholder: "ex : un sweat oversize streetwear, plutôt sombre, taille L" },
+  };
+  const TITLE_HINTS = { lot: "ex : Lot de chargeurs", perso: "ex : De l'argent", idea: "ex : Sweat streetwear" };
+  const LINK_FORM = {
+    lot: { placeholder: "Colle le lien d'un article du lot…", button: "+ Au lot", empty: "Ajoute les liens des articles du lot ci-dessus." },
+    idea: { placeholder: "Colle un lien d'exemple (produit, photo…)", button: "+ Exemple", empty: "Ajoute des liens d'exemple pour montrer le style (facultatif)." },
   };
 
   // Affiche les éléments dont data-for contient le type choisi
@@ -459,6 +503,10 @@
     els.pvPriceLabel.textContent = LABELS[k].price;
     els.pvTextLabel.textContent = LABELS[k].text;
     els.pvText.placeholder = LABELS[k].placeholder;
+    if (LINK_FORM[k]) {
+      els.lotUrl.placeholder = LINK_FORM[k].placeholder;
+      els.lotAddBtn.textContent = LINK_FORM[k].button;
+    }
   }
 
   function renderStars() {
@@ -478,40 +526,114 @@
     els.pvImage.hidden = kind !== "product" || !src;
   }
 
+  // Liste éditable : articles d'un lot, ou liens d'exemple d'une idée (sans prix)
   function renderLotItems() {
     const items = pending?.items || [];
     els.lotItems.replaceChildren(...items.map((it, i) => {
       const li = el("li");
-      li.append(it.image ? image(it.image, it.title) : placeholder());
+      const src = imageOf(it);
+      li.append(src ? image(src, it.title) : placeholder(it.kind === "idea" ? "💡" : "🎁"));
       const title = el("input");
       title.value = it.title || "";
       title.oninput = () => (it.title = title.value);
-      const price = el("input");
-      price.type = "number";
-      price.step = "0.01";
-      price.min = "0";
-      price.placeholder = "Prix";
-      price.value = it.price ?? "";
-      price.oninput = () => { it.price = parsePrice(price.value); syncLotPrice(); };
+      li.append(title);
+      if (kind === "lot") {
+        const price = el("input");
+        price.type = "number";
+        price.step = "0.01";
+        price.min = "0";
+        price.placeholder = "Prix";
+        price.value = it.price ?? "";
+        price.oninput = () => { it.price = parsePrice(price.value); syncLotPrice(); };
+        li.append(price);
+      }
       const rm = el("button", "btn del", "✕");
       rm.type = "button";
-      rm.setAttribute("aria-label", "Retirer du lot");
-      rm.onclick = () => { items.splice(i, 1); renderLotItems(); syncLotPrice(); };
-      li.append(title, price, rm);
+      rm.setAttribute("aria-label", "Retirer");
+      rm.onclick = () => { items.splice(i, 1); renderLotItems(); syncLotPrice(); fillLotPick(); };
+      li.append(rm);
       return li;
     }));
-    if (!items.length) els.lotItems.append(el("li", "lot-empty", "Ajoute les liens des articles du lot ci-dessus."));
+    if (!items.length && LINK_FORM[kind]) els.lotItems.append(el("li", "lot-empty", LINK_FORM[kind].empty));
   }
+
+  // ---------- Mettre une envie existante dans un lot ----------
+  // L'envie quitte la liste principale et devient un élément du lot à l'enregistrement.
+  function toLotItem(w) {
+    const base = { fromId: w.id, title: w.title, price: w.price ?? null };
+    return kindOf(w) === "idea"
+      ? { ...base, kind: "idea", note: w.note, links: w.links || [] }
+      : { ...base, url: w.url, image: w.image };
+  }
+
+  function fillLotPick() {
+    const taken = new Set((pending?.items || []).map((i) => i.fromId));
+    const options = wishes.filter((w) => ["product", "idea"].includes(kindOf(w)) && !taken.has(w.id));
+    els.lotPick.replaceChildren(
+      new Option("➕ Ajouter une envie déjà dans ma liste…", ""),
+      ...options.map((w) => new Option(`${kindOf(w) === "idea" ? "💡" : "🔗"} ${w.title}`, w.id)),
+    );
+    els.lotPick.disabled = !options.length;
+  }
+
+  function addExistingToLot(id) {
+    const w = wishes.find((x) => x.id === id);
+    if (!w || !pending) return;
+    pending.items.push(toLotItem(w));
+    renderLotItems();
+    syncLotPrice();
+    fillLotPick();
+  }
+
+  els.lotPick.addEventListener("change", () => {
+    addExistingToLot(els.lotPick.value);
+    els.lotPick.value = "";
+  });
+
+  let lotTarget = null;
+  function askLot(w) {
+    const lots = wishes.filter((x) => kindOf(x) === "lot");
+    if (!lots.length) return startLotWith(w, null);
+    lotTarget = w;
+    els.lotDialogText.textContent = `Dans quel lot mettre « ${w.title} » ?`;
+    els.lotDialogSelect.replaceChildren(
+      ...lots.map((l) => new Option(`📦 ${l.title}`, l.id)),
+      new Option("➕ Nouveau lot", ""),
+    );
+    els.lotDialog.showModal();
+  }
+
+  function startLotWith(w, lotId) {
+    if (pending?.editing && !confirm("Abandonner la modification en cours ?")) return;
+    resetAdd();
+    const lot = wishes.find((x) => x.id === lotId);
+    if (lot) editWish(lot);
+    else {
+      openEditor({ kind: "lot" }, "Nouveau lot : ajoute d'autres articles puis enregistre.");
+      els.addPanel.scrollIntoView({ behavior: "smooth" });
+    }
+    addExistingToLot(w.id);
+    els.pvNote.textContent = `« ${w.title} » ajouté au lot. Pense à enregistrer.`;
+  }
+
+  els.lotDialogOk.addEventListener("click", (e) => {
+    e.preventDefault();
+    els.lotDialog.close();
+    if (lotTarget) startLotWith(lotTarget, els.lotDialogSelect.value || null);
+    lotTarget = null;
+  });
 
   // Par défaut le prix du lot = somme des articles (modifiable, ex. 1 acheté 1 offert)
   function syncLotPrice() {
-    if (lotPriceTouched) return;
+    if (lotPriceTouched || kind !== "lot") return;
     const sum = (pending?.items || []).reduce((s, i) => s + (i.price || 0), 0);
     els.pvPrice.value = sum ? Math.round(sum * 100) / 100 : "";
   }
 
   function openEditor(data, hint = "") {
-    pending = { ...data, items: data.items ? data.items.map((i) => ({ ...i })) : [] };
+    // Pour une idée, la liste éditable contient ses liens d'exemple
+    const list = kindOf(data) === "idea" ? data.links : data.items;
+    pending = { ...data, items: list ? list.map((i) => ({ ...i })) : [] };
     setKind(kindOf(data));
     els.pvTitle.value = data.title || "";
     els.pvPrice.value = data.price ?? "";
@@ -519,12 +641,13 @@
     els.pvEmoji.value = data.emoji || "💶";
     els.pvEmojiPreview.textContent = els.pvEmoji.value;
     els.pvText.value = data.note || "";
-    els.pvTitle.placeholder = kind === "lot" ? "ex : Lot de chargeurs" : kind === "perso" ? "ex : De l'argent" : "";
+    els.pvTitle.placeholder = TITLE_HINTS[kind] || "";
     rating = data.rating || 0;
     lotPriceTouched = kind === "lot" && data.price != null;
     setImage(data.image);
     renderStars();
     renderLotItems();
+    fillLotPick();
     els.pvNote.textContent = hint;
     els.preview.hidden = false;
   }
@@ -581,14 +704,19 @@
     els.lotAddBtn.textContent = "Recherche…";
     try {
       const data = await scrapeProduct(url);
-      pending.items.push({ url, title: data.title, image: data.image, price: data.price });
+      const isIdea = kind === "idea";
+      pending.items.push(isIdea
+        ? { url, title: data.title, image: data.image }
+        : { url, title: data.title, image: data.image, price: data.price });
       els.lotForm.reset();
       renderLotItems();
       syncLotPrice();
-      els.pvNote.textContent = data.price ? "" : "Prix d'un article introuvable, tu peux le saisir dans la liste.";
+      els.pvNote.textContent = isIdea
+        ? (data.image ? "" : "Pas de photo trouvée pour ce lien.")
+        : (data.price ? "" : "Prix d'un article introuvable, tu peux le saisir dans la liste.");
     } finally {
       els.lotAddBtn.disabled = false;
-      els.lotAddBtn.textContent = "+ Au lot";
+      els.lotAddBtn.textContent = LINK_FORM[kind]?.button || "+ Au lot";
     }
   });
 
@@ -610,11 +738,12 @@
       return { ...common, url, title: common.title || siteName(url), image: els.pvImageUrl.value.trim() };
     }
     if (kind === "lot") {
-      const items = pending.items.filter((i) => i.url);
+      const items = pending.items.filter((i) => i.url || i.kind === "idea");
       if (!items.length) throw new Error("ajoute au moins un article au lot.");
       return { ...common, title: common.title || `Lot de ${items.length} articles`, items };
     }
     if (!common.title) throw new Error("donne un nom à cette envie.");
+    if (kind === "idea") return { ...common, links: pending.items.filter((l) => l.url) };
     return { ...common, emoji: els.pvEmoji.value.trim() || "💶" };
   }
 
@@ -623,9 +752,15 @@
     let fields;
     try { fields = collectFields(); } catch (e) { toast("Oups : " + e.message); return; }
     const editing = pending.editing;
-    const next = editing
+    // Les envies mises dans le lot quittent la liste principale
+    const absorbed = new Set();
+    if (fields.items) {
+      fields.items = fields.items.map(({ fromId, ...item }) => { if (fromId) absorbed.add(fromId); return item; });
+    }
+    const next = (editing
       ? wishes.map((w) => (w.id === pending.id ? { id: w.id, addedAt: w.addedAt, ...fields } : w))
-      : [...wishes, { id: crypto.randomUUID?.() || String(Date.now()), ...fields, addedAt: new Date().toISOString() }];
+      : [...wishes, { id: crypto.randomUUID?.() || String(Date.now()), ...fields, addedAt: new Date().toISOString() }]
+    ).filter((w) => !absorbed.has(w.id));
     els.pvSave.disabled = true;
     try {
       await saveWishes(next, `${editing ? "Modifie" : "Ajoute"} : ${fields.title}`);
