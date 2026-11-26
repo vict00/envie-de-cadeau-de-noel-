@@ -115,5 +115,27 @@
       }
     ],
     "addedAt": "2026-11-23T13:22:34.019Z"
+  },
+  {
+    "id": "399e3575-293c-4210-add0-eda0acc1f7e6",
+    "kind": "lot",
+    "title": "ensemble de collier",
+    "price": 57.35,
+    "rating": 4,
+    "items": [
+      {
+        "url": "https://www.amazon.com/Crucifix-Necklace-Crystal-Choker-Jewelry/dp/B0B4NPL8F7",
+        "title": "8mm Pearl Necklace for Men Women, Crystal Cross Necklace Christian Gift",
+        "image": "https://m.media-amazon.com/images/I/41AE-DZIBxL._AC_SL1500_.jpg",
+        "price": 9
+      },
+      {
+        "url": "https://www.amazon.fr/Miraculeuse-pendentif-religieux-grand-m%C3%A8re-confirmation/dp/B0DZP9QT53/ref=sr_1_6?adgrpid=203764425074&dib=eyJ2IjoiMSJ9.H-qU_sG1HlLTEb8sBUU5oBDKPOtefNNkpnqZ_P2-wWy9YFRQ-bzbWp_1T9wiW68l3r2cxi_yTVpOExTq4WNSkfm91M7fTFNVyMWE__Xu29YLOczzRxBt-3nnKzAzZL3QQLayJWQ0KtyvP_XPOezDEI4M7rNSuOLYJX1mzqGc1RzU5mHmBzaCUqYvvVDOd1CQQNa70K10cGmcF7t_rA8dudqEXi9BCO3mI5n_jkiqwUvE7-bG2dh_8HzAvPPvSYt-f4XQWVhLH4k_covPpzmQzBJCeZlR0UaBo9xxWG8DKMQ.1CahUC6He-cguxvrX8gzmnRODjET1icQ9p_1hkpjXl4&dib_tag=se&hvadid=826520719431&hvcampaign=24306999593&hvdev=c&hvexpln=0&hvlocphy=9055744&hvnetw=g&hvocijid=1927752883380073361--&hvqmt=b&hvrand=1927752883380073361&hvtargid=kwd-5365515448&hydadcr=14197_2403567_215498&keywords=chapelet+en+argent&mcid=bdaa185961c4305da505526e09946a88&qid=1795683590&sr=8-6",
+        "title": "925 Sterling Silver Rosary Necklace with Miraculous Madonna Medal and Cross Pendant Religious Jewellery for Women Girls Friends Mum Grandma Communion Confirmation Gift",
+        "image": "https://m.media-amazon.com/images/I/31vuOkfKJ2L._AC_SL1000_.jpg",
+        "price": 48.35
+      }
+    ],
+    "addedAt": "2026-11-26T09:09:44.723Z"
   }
 ]
